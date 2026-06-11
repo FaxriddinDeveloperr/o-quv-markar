@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Asosiy accent — binafsha/indigo gradient asosi */
+    --primary: 256 90% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 256 60% 96%;
+    --secondary-foreground: 256 60% 30%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 256 60% 96%;
+    --accent-foreground: 256 60% 30%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 256 90% 60%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 224 30% 8%;
+    --foreground: 210 40% 98%;
+
+    --card: 224 28% 11%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 224 28% 11%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 256 90% 68%;
+    --primary-foreground: 224 30% 8%;
+
+    --secondary: 256 30% 18%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 223 20% 18%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 256 30% 20%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 223 20% 20%;
+    --input: 223 20% 22%;
+    --ring: 256 90% 68%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    /* Telegram safe area */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    overscroll-behavior-y: none;
+    font-feature-settings: "cv11", "ss01";
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background-image: linear-gradient(
+      135deg,
+      hsl(256 90% 62%) 0%,
+      hsl(280 85% 60%) 100%
+    );
+  }
+  .gradient-text {
+    background-image: linear-gradient(
+      135deg,
+      hsl(256 90% 60%) 0%,
+      hsl(280 85% 58%) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  }
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  @apply relative overflow-hidden bg-muted;
+}
+.skeleton::after {
+  content: "";
+  @apply absolute inset-0 -translate-x-full;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    hsl(0 0% 100% / 0.25),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Leaflet xarita konteyner balandligi to'g'ri ishlashi uchun */
+.leaflet-container {
+  font: inherit;
+  z-index: 0;
+}

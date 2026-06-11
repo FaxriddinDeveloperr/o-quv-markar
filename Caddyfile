@@ -1,0 +1,6 @@
+# Caddy avtomatik ravishda Let's Encrypt SSL sertifikat oladi.
+# APP_DOMAIN domeni server IP'siga yo'naltirilgan bo'lishi va 80/443 portlari ochiq bo'lishi shart.
+{$APP_DOMAIN} {
+	encode gzip
+	reverse_proxy app:3000
+}

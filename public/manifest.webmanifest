@@ -1,0 +1,13 @@
+{
+  "name": "O'quv markazlar",
+  "short_name": "O'quv markaz",
+  "description": "Toshkent va viloyatlardagi o'quv markazlarni toping: kurslar, narxlar, lokatsiya.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "lang": "uz",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

@@ -1,0 +1,156 @@
+// O'quv Markazlar Mini App — Prisma schema (PostgreSQL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Telegram foydalanuvchisi
+model User {
+  id         String     @id @default(cuid())
+  telegramId BigInt     @unique
+  firstName  String
+  lastName   String?
+  username   String?
+  phone      String?
+  languageCode String?  @default("uz")
+  favorites  Favorite[]
+  leads      Lead[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  @@index([telegramId])
+}
+
+// Viloyat / Hudud
+model Region {
+  id        String     @id @default(cuid())
+  name      String // o'zbekcha nom
+  nameRu    String // ruscha nom
+  order     Int        @default(0)
+  districts District[]
+
+  @@index([order])
+}
+
+// Tuman
+model District {
+  id       String   @id @default(cuid())
+  name     String // o'zbekcha nom
+  nameRu   String // ruscha nom
+  order    Int      @default(0)
+  region   Region   @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  regionId String
+  centers  Center[]
+
+  @@index([order])
+  @@index([regionId])
+}
+
+// O'quv markaz
+model Center {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  descriptionRu String?
+  district      District       @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  districtId    String
+  address       String
+  latitude      Float
+  longitude     Float
+  phone         String
+  telegramUrl   String?
+  logoUrl       String?
+  photos        String[]       @default([])
+  rating        Float          @default(0)
+  viewsCount    Int            @default(0)
+  isActive      Boolean        @default(true)
+  courses       Course[]
+  results       CenterResult[]
+  favorites     Favorite[]
+  leads         Lead[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([districtId])
+  @@index([isActive])
+}
+
+// Kurs / Fan
+model Course {
+  id            String  @id @default(cuid())
+  center        Center  @relation(fields: [centerId], references: [id], onDelete: Cascade)
+  centerId      String
+  name          String
+  nameRu        String
+  price         Int // so'mda
+  durationMonths Int    @default(1)
+  description   String?
+
+  @@index([centerId])
+}
+
+// Natijalar / Sertifikatlar
+model CenterResult {
+  id       String @id @default(cuid())
+  center   Center @relation(fields: [centerId], references: [id], onDelete: Cascade)
+  centerId String
+  title    String
+  imageUrl String
+
+  @@index([centerId])
+}
+
+// Foydalanuvchi saqlagan markazlar
+model Favorite {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  center    Center   @relation(fields: [centerId], references: [id], onDelete: Cascade)
+  centerId  String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, centerId])
+  @@index([userId])
+}
+
+// Lead — "Qo'ng'iroqqa buyurtma" (foydalanuvchi raqam qoldiradi)
+model Lead {
+  id        String     @id @default(cuid())
+  center    Center     @relation(fields: [centerId], references: [id], onDelete: Cascade)
+  centerId  String
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    String?
+  name      String
+  phone     String
+  note      String?
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+
+  @@index([centerId])
+  @@index([status])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  DONE
+}
+
+// Admin
+model Admin {
+  id           String    @id @default(cuid())
+  username     String    @unique
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  createdAt    DateTime  @default(now())
+}
+
+enum AdminRole {
+  SUPERADMIN
+  ADMIN
+}

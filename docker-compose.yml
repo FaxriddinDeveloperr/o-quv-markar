@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: oquv-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: oquv
+      POSTGRES_PASSWORD: oquv123
+      POSTGRES_DB: oquv_markaz
+    ports:
+      - "5433:5432"
+    volumes:
+      - oquv_pgdata:/var/lib/postgresql/data
+
+volumes:
+  oquv_pgdata:

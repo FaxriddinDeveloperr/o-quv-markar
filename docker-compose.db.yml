@@ -1,0 +1,28 @@
+# O'quv Markaz — FAQAT PostgreSQL (PM2 deploy uchun)
+# Ilova va bot serverda PM2'da ishlaydi, baza esa shu konteynerда.
+# Ishga tushirish:  docker compose -f docker-compose.db.yml up -d
+#
+# Port faqat localhost'ga (127.0.0.1) chiqariladi — tashqaridan ulanib bo'lmaydi.
+# DATABASE_URL host = localhost, port = 5433 bo'lsin.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: oquv-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  pgdata:

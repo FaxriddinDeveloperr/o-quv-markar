@@ -1,0 +1,68 @@
+# O'quv Markaz Mini App — production stack
+# Ishga tushirish:  docker compose -f docker-compose.prod.yml up -d --build
+# .env faylidan o'qiydi (.env.production.example dan nusxa oling)
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: oquv-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    image: oquv-markaz:latest
+    container_name: oquv-app
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      # Admin yuklagan rasmlar saqlanib qolishi uchun
+      - uploads:/app/public/uploads
+    expose:
+      - "3000"
+
+  bot:
+    build: .
+    image: oquv-markaz:latest
+    container_name: oquv-bot
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: npm run bot
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: oquv-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:
